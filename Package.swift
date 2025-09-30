@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
 	name: "NetworkUtilsKit",
-	platforms: [.iOS("16.0"), .macOS("14.0")],
+	platforms: [.iOS("15.0"), .macOS("14.0")],
 	products: [
 		.library(name: "NetworkUtilsKit", targets: ["NetworkUtilsKit"])
 	],
