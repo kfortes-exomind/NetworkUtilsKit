@@ -10,7 +10,8 @@ let package = Package(
         .library(name: "NetworkUtilsKit", targets: ["NetworkUtilsKit"])
     ],
     dependencies: [
-        .package(url: "https://github.com/kfortes-exomind/UtilsKit.git", branch: "Version-4-0-0-Swift5"),
+        .package(url: "https://github.com/kfortes-exomind/UtilsKit.git",
+                 .revision("b102359"))
     ],
     targets: [
         .target(
