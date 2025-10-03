@@ -16,6 +16,11 @@ let package = Package(
     targets: [
         .target(
             name: "NetworkUtilsKit",
-            dependencies: ["UtilsKitCore"])
+            dependencies: [
+                .product(name: "UtilsKitCore", package: "UtilsKit"),
+                .product(name: "UtilsKitHelpers", package: "UtilsKit"),
+                .product(name: "UtilsKitUI", package: "UtilsKit")
+            ]
+        )
     ]
 )
