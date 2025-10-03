@@ -12,9 +12,7 @@ import Foundation
 import FoundationNetworking
 #endif
 
-public protocol AuthentificationRefreshableProtocol: AuthentificationProtocol, Sendable {
-	
-	var isValid: Bool { get async }
+public protocol AuthentificationRefreshableProtocol: AuthentificationProtocol {
     
-	nonisolated func refresh(from request: URLRequest?) async throws
+    func refresh(from request: URLRequest) async throws
 }

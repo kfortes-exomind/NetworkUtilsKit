@@ -23,19 +23,19 @@ import FoundationNetworking
 
 extension URLSession {
 	
-	nonisolated func data(with request: URLRequest, description: String) async throws -> (Data?, URLResponse?) {
+	func data(with request: URLRequest, description: String) async throws -> (Data?, URLResponse?) {
 		try await withUnsafeThrowingContinuation { continuation in
-			Task {
-				let task = self.dataTask(with: request) { data, response, error in
-					Task {
-						await RequestManager.shared.set(task: nil, for: description)
-						if let error = error { continuation.resume(throwing: error); return }
-						continuation.resume(returning: (data, response))
-					}
+			let task = self.dataTask(with: request) { data, response, error in
+				DispatchQueue.main.async {
+					RequestManager.shared.tasks.removeValue(forKey: description)
 				}
-				await RequestManager.shared.set(task: task, for: description)
-				task.resume()
+				if let error = error { continuation.resume(throwing: error); return }
+				continuation.resume(returning: (data, response))
 			}
+			DispatchQueue.main.async {
+				RequestManager.shared.tasks[description] = task
+			}
+			task.resume()
 		}
 	}
 }
@@ -50,39 +50,38 @@ extension RequestManager {
 						 path: String,
 						 port: Int?,
 						 warningTime: Double,
+						 timeOut: TimeInterval,
 						 method: RequestMethod = .get,
-						 urlParameters: [String: String]?,
-						 parameters: Parameters?,
-						 files: [RequestFile]?,
-						 headers: Headers?,
-						 authentification: AuthentificationProtocol?,
-						 timeout: TimeInterval?,
+						 parameters: ParametersArray? = nil,
+						 files: [RequestFile]? = nil,
+						 encoding: Encoding = .url,
+						 headers: Headers? = nil,
+						 authentification: AuthentificationProtocol? = nil,
 						 description: String,
-						 retryAuthentification: Bool,
+						 retryAuthentification: Bool = true,
 						 cachePolicy: URLRequest.CachePolicy = .reloadIgnoringLocalCacheData) async throws -> NetworkResponse {
 		
 		// Request
-		var request: URLRequest = try await self.buildRequest(scheme: scheme,
-															  host: host,
-															  path: path,
-															  port: port,
-															  method: method,
-															  urlParameters: urlParameters,
-															  parameters: parameters,
-															  files: files,
-															  headers: headers,
-															  authentification: authentification,
-															  timeout: timeout,
-															  cachePolicy: cachePolicy)
+		var request: URLRequest = try self.buildRequest(scheme: scheme,
+														host: host,
+														path: path,
+														port: port,
+														method: method,
+														parameters: parameters,
+														files: files,
+														encoding: encoding,
+														headers: headers,
+														authentification: authentification,
+														cachePolicy: cachePolicy)
 		
-		request.timeoutInterval = timeout ?? self.requestTimeoutInterval
+		request.timeoutInterval = timeOut
 		
-		Logger.requestSend.notice("\(description)")
+		Logger.requestSend.notice(message: description)
 		
 		// Date
 		let startDate = Date()
 		let session = URLSession(configuration: self.requestConfiguration)
-		session.configuration.timeoutIntervalForRequest = timeout ?? self.requestTimeoutInterval
+		session.configuration.timeoutIntervalForRequest = timeOut
 		
 		do {
 			// Call
@@ -97,9 +96,9 @@ extension RequestManager {
 			
 			if response.statusCode >= 200 && response.statusCode < 300 {
 				if time > warningTime {
-					Logger.requestSuccess.warning("\(requestId)")
+					Logger.requestSuccess.warning(message: requestId)
 				} else {
-					Logger.requestSuccess.info("\(requestId)")
+					Logger.requestSuccess.info(message: requestId)
 				}
 				return (response.statusCode, data)
 			} else if response.statusCode == 401 && retryAuthentification {
@@ -129,13 +128,13 @@ extension RequestManager {
 											  path: path,
 											  port: port,
 											  warningTime: warningTime,
+											  timeOut: timeOut,
 											  method: method,
-											  urlParameters: urlParameters,
 											  parameters: parameters,
 											  files: files,
+											  encoding: encoding,
 											  headers: headers,
 											  authentification: authentification,
-											  timeout: timeout,
 											  description: description,
 											  retryAuthentification: false,
 											  cachePolicy: cachePolicy)
@@ -145,7 +144,7 @@ extension RequestManager {
 									   data: data)
 			}
 		} catch {
-			Logger.requestFail.fault("\(description) - \(error.localizedDescription)")
+			Logger.requestFail.fault(message: description, error: error)
 			throw error
 		}
 	}
@@ -167,7 +166,7 @@ extension RequestManager {
 							 response: HTTPURLResponse,
 							 data: Data?) -> Error  {
 		let error = ResponseError.network(response: response, data: data)
-		Logger.requestFail.fault("\(requestId) - \(error.localizedDescription)")
+		Logger.requestFail.fault(message: requestId, error: error)
 		return error
 	}
 	
@@ -182,13 +181,13 @@ extension RequestManager {
 							   path: request.path,
 							   port: request.port,
 							   warningTime: request.warningTime,
+							   timeOut: request.timeOut,
 							   method: request.method,
-							   urlParameters: request.urlParameters,
-							   parameters: request.parameters,
+							   parameters: request.parametersArray,
 							   files: request.files,
+							   encoding: request.encoding,
 							   headers: request.headers,
 							   authentification: request.authentification,
-							   timeout: request.timeoutInterval,
 							   description: request.description,
 							   retryAuthentification: request.canRefreshToken,
 							   cachePolicy: request.cachePolicy)

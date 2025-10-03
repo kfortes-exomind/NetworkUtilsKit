@@ -49,7 +49,7 @@ internal struct NetworkCache {
     internal static let shared = NetworkCache()
     
     // MARK: - Variables
-	internal var defaults: UserDefaults? { UserDefaults(suiteName: kUserDefaultsName) }
+    internal let defaults = UserDefaults(suiteName: kUserDefaultsName)
     
     // MARK: - Functions
     internal func set(_ datas: Data?, for key: CacheKey) {
