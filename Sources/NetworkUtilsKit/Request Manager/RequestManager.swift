@@ -126,10 +126,10 @@ extension RequestManager {
                 do {
                     dataBody = try JSONSerialization.data(withJSONObject: finalBodyParameters, options: [])
                 } catch {
-					Logger.data.fault("JSON is invalid - \(error.localizedDescription)")
+					print("JSON is invalid - \(error.localizedDescription)")
                 }
             } else {
-				Logger.data.fault("JSON is invalid - \(RequestError.json.localizedDescription)")
+				print("JSON is invalid - \(RequestError.json.localizedDescription)")
             }
         }
         
@@ -154,7 +154,7 @@ extension RequestManager {
 				requestBody.queryItems = finalBodyParameters.map { URLQueryItem(name: $0.key, value: "\($0.value)") }
 				dataBody = requestBody.query?.data(using: .utf8)
 			} else {
-				Logger.data.fault("JSON is invalid - \(RequestError.json.localizedDescription)")
+				print("JSON is invalid - \(RequestError.json.localizedDescription)")
 			}
 		}
 		

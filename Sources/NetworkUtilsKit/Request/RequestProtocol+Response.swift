@@ -78,7 +78,7 @@ extension RequestProtocol {
             let objects = try T.decode(from: data)
             return objects
         } catch {
-			Logger.decode.fault("\(self.description)")
+            print("\(self.description)")
             throw error
         }
     }
