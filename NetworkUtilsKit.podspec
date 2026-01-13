@@ -87,6 +87,8 @@ Pod::Spec.new do |spec|
   #
 
   spec.source_files  = "Sources/NetworkUtilsKit/**/*.swift"
+  
+  spec.dependency 'UtilsKit', '~> 4.0'
 
 
   # ――― Resources ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
