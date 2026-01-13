@@ -86,10 +86,12 @@ Pod::Spec.new do |spec|
   #  Not including the public_header_files will make all headers public.
   #
 
-  spec.source_files  = "Sources/NetworkUtilsKit/**/*.swift"
-  # spec.exclude_files = "Classes/Exclude"
-
-  # spec.public_header_files = "Classes/**/*.h"
+  spec.source_files  = "Sources/NetworkUtilsKit/Authentification/*.swift"
+  spec.source_files  = "Sources/NetworkUtilsKit/Cache/*.swift"
+  spec.source_files  = "Sources/NetworkUtilsKit/Error/*.swift"
+  spec.source_files  = "Sources/NetworkUtilsKit/Log/*.swift"
+  spec.source_files  = "Sources/NetworkUtilsKit/Request/*.swift"
+  spec.source_files  = "Sources/NetworkUtilsKit/RequestManager/Utils/*.swift"
 
 
   # ――― Resources ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
