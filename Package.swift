@@ -11,7 +11,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/kfortes-exomind/UtilsKit.git",
-                 .revision("fbce56c"))
+                 .revision("a1dé894"))
     ],
     targets: [
         .target(
